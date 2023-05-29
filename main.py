@@ -105,21 +105,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # Load data
-    # transformer = transforms.Compose([transforms.ToTensor(),
-    #                                   transforms.Normalize((0.1307,),
-    #                                                        (0.3081,))])
-    # train_loader = torch.utils.data.DataLoader(
-    #     datasets.MNIST(args.dir, train=True, download=True,
-    #                    transform=transformer),
-    #     batch_size=args.batch_size, shuffle=False)
-    #
-    # test_loader = torch.utils.data.DataLoader(
-    #     datasets.MNIST(args.dir, train=False, transform=transformer),
-    #     batch_size=args.batch_size, shuffle=True)
-    # fuck = datasets.MNIST(args.dir, train=True, download=True, transform=transformer)
-    # print(fuck[0][0].shape)
-
     ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
     ns_yoga.dropna(subset=['content'], inplace=True)
     tfidf = torch.tensor(get_tfidf_data(ns_yoga)).type(torch.float32)
