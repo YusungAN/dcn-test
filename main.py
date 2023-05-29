@@ -120,7 +120,7 @@ if __name__ == '__main__':
     # fuck = datasets.MNIST(args.dir, train=True, download=True, transform=transformer)
     # print(fuck[0][0].shape)
 
-    ns_yoga = pd.read_csv('ns_yoga_preprocessed.csv')
+    ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
     ns_yoga.dropna(subset=['content'], inplace=True)
     tfidf = torch.tensor(get_tfidf_data(ns_yoga)).type(torch.float32)
     dataset = torch.utils.data.TensorDataset(tfidf)
