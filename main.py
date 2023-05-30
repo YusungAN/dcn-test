@@ -10,8 +10,6 @@ import pandas as pd
 def evaluate(model, test_loader, label_list):
     lat_x = 0
     for data in test_loader:
-        print(data)
-        print(data.shape)
         data = data[0].to(model.device)
         batch_size = data.size()[0]
         data = data.view(batch_size, -1)
