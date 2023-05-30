@@ -42,7 +42,6 @@ def solver(args, model, train_loader):
 
         label_li = evaluate(model, train_loader)  # evaluation on test_loader
         print(label_li)
-        print('\nEpoch: {:02d} | example label: {}\n'.format(e, lat_x))
     labels = pd.Series(label_li)
     ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
     ns_yoga['label'] = labels
