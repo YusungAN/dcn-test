@@ -33,14 +33,14 @@ def get_tfidf_data(train_data):
 
 
 def solver(args, model, train_loader):
-
+    label_li = []
     rec_loss_list = model.pretrain(train_loader, args.pre_epoch)
     for e in range(args.epoch):
         model.train()
         model.fit(e, train_loader)
         model.eval()
 
-        label_li = evaluate(model, train_loader, label_li)  # evaluation on test_loader
+        label_li = evaluate(model, train_loader)  # evaluation on test_loader
         print(label_li)
         print('\nEpoch: {:02d} | example label: {}\n'.format(e, lat_x))
     labels = pd.Series(label_li)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
                         help='weight decay (default: 5e-4)')
     parser.add_argument('--batch-size', type=int, default=256,
                         help='input batch size for training')
-    parser.add_argument('--epoch', type=int, default=30,
+    parser.add_argument('--epoch', type=int, default=50,
                         help='number of epochs to train')
     parser.add_argument('--pre-epoch', type=int, default=50, 
                         help='number of pre-train epochs')
