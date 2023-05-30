@@ -34,9 +34,8 @@ def get_tfidf_data(train_data):
 def solver(args, model, train_loader):
 
     rec_loss_list = model.pretrain(train_loader, args.pre_epoch)
-
+    label_li = []
     for e in range(args.epoch):
-        label_li = []
         model.train()
         model.fit(e, train_loader)
 
@@ -45,7 +44,8 @@ def solver(args, model, train_loader):
         lat_x = evaluate(model, train_loader, label_li)  # evaluation on test_loader
 
         print('\nEpoch: {:02d} | example label: {}\n'.format(e, lat_x))
-
+        if e < args.epoch-1:
+            label_li = []
     labels = pd.Series(label_li)
     ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
     ns_yoga['label'] = labels
@@ -70,7 +70,7 @@ if __name__ == '__main__':
                         help='weight decay (default: 5e-4)')
     parser.add_argument('--batch-size', type=int, default=256,
                         help='input batch size for training')
-    parser.add_argument('--epoch', type=int, default=100,
+    parser.add_argument('--epoch', type=int, default=30,
                         help='number of epochs to train')
     parser.add_argument('--pre-epoch', type=int, default=50, 
                         help='number of pre-train epochs')
