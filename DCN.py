@@ -74,6 +74,7 @@ class DCN(nn.Module):
         for e in range(epoch):
             for batch_idx, data in enumerate(train_loader):
                 data = data[0]
+                data = data.to(self.device)
                 batch_size = data.size()[0]
                 rec_X = self.autoencoder(data)
                 loss = self.criterion(data, rec_X)
@@ -95,6 +96,7 @@ class DCN(nn.Module):
         # Initialize clusters in self.kmeans after pre-training
         batch_X = []
         for batch_idx, data in enumerate(train_loader):
+            data = data[0].to(self.device)
             batch_size = data.size()[0]
             latent_X = self.autoencoder(data, latent=True)
             batch_X.append(latent_X.detach().cpu().numpy())
@@ -106,6 +108,7 @@ class DCN(nn.Module):
     def fit(self, epoch, train_loader, verbose=True):
 
         for batch_idx, data in enumerate(train_loader):
+            data = data[0].to(self.device)
             batch_size = data.size()[0]
 
             # Get the latent features
