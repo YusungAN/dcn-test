@@ -34,9 +34,9 @@ def get_tfidf_data(train_data):
 def solver(args, model, train_loader):
 
     rec_loss_list = model.pretrain(train_loader, args.pre_epoch)
-    label_li = []
 
     for e in range(args.epoch):
+        label_li = []
         model.train()
         model.fit(e, train_loader)
 
