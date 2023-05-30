@@ -7,22 +7,21 @@ from sklearn.metrics import adjusted_rand_score
 from sklearn.metrics import normalized_mutual_info_score
 import pandas as pd
 
-def evaluate(model, test_loader):
-    y_test = []
-    y_pred = []
-    for data, target in test_loader:
+def evaluate(model, test_loader, label_list):
+    lat_x = 0
+    for data in test_loader:
+        print(data)
+        print(data.shape)
+        data = data[0].to(model.device)
         batch_size = data.size()[0]
-        data = data.view(batch_size, -1).to(model.device)
+        data = data.view(batch_size, -1)
         latent_X = model.autoencoder(data, latent=True)
         latent_X = latent_X.detach().cpu().numpy()
 
-        y_test.append(target.view(-1, 1).numpy())
-        y_pred.append(model.kmeans.update_assign(latent_X).reshape(-1, 1))
+        lat_x = model.kmeans.update_assign(latent_X).reshape(-1, 1)
+        label_list.append(lat_x)
 
-    y_test = np.vstack(y_test).reshape(-1)
-    y_pred = np.vstack(y_pred).reshape(-1)
-    return (normalized_mutual_info_score(y_test, y_pred),
-            adjusted_rand_score(y_test, y_pred))
+    return lat_x
 
 
 def get_tfidf_data(train_data):
@@ -34,26 +33,22 @@ def get_tfidf_data(train_data):
     return tfidf_train
 
 
-def solver(args, model, train_loader, test_loader):
+def solver(args, model, train_loader):
 
     rec_loss_list = model.pretrain(train_loader, args.pre_epoch)
-    nmi_list = []
-    ari_list = []
+    label_li = []
 
     for e in range(args.epoch):
         model.train()
         model.fit(e, train_loader)
 
         model.eval()
-        NMI, ARI = evaluate(model, test_loader)  # evaluation on test_loader
-        nmi_list.append(NMI)
-        ari_list.append(ARI)
 
-        print('\nEpoch: {:02d} | NMI: {:.3f} | ARI: {:.3f}\n'.format(
-            e, NMI, ARI))
+        lat_x = evaluate(model, train_loader, label_li)  # evaluation on test_loader
 
-    return rec_loss_list, nmi_list, ari_list
+        print('\nEpoch: {:02d} | example label: {}\n'.format(e, lat_x))
 
+    print('\nall length:', len(label_li))
 
 if __name__ == '__main__':
 
@@ -112,11 +107,7 @@ if __name__ == '__main__':
     train_loader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=False
     )
-    test_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=args.batch_size, shuffle=False
-    )
 
     # Main body
     model = DCN(args)
-    rec_loss_list, nmi_list, ari_list = solver(
-        args, model, train_loader, test_loader)
+    solver(args, model, train_loader)
