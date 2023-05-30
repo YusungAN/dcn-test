@@ -7,8 +7,8 @@ from sklearn.metrics import adjusted_rand_score
 from sklearn.metrics import normalized_mutual_info_score
 import pandas as pd
 
-def evaluate(model, test_loader, label_list):
-    lat_x = 0
+def evaluate(model, test_loader):
+    label_list = []
     for data in test_loader:
         data = data[0].to(model.device)
         batch_size = data.size()[0]
@@ -17,9 +17,10 @@ def evaluate(model, test_loader, label_list):
         latent_X = latent_X.detach().cpu().numpy()
 
         label_x = model.kmeans.update_assign(latent_X)
+        print('eval', label_x)
         label_list = np.hstack((label_list, label_x))
 
-    return lat_x
+    return label_list
 
 
 def get_tfidf_data(train_data):
@@ -34,14 +35,12 @@ def get_tfidf_data(train_data):
 def solver(args, model, train_loader):
 
     rec_loss_list = model.pretrain(train_loader, args.pre_epoch)
-    label_li = []
     for e in range(args.epoch):
         model.train()
         model.fit(e, train_loader)
-
         model.eval()
 
-        lat_x = evaluate(model, train_loader, label_li)  # evaluation on test_loader
+        label_li = evaluate(model, train_loader, label_li)  # evaluation on test_loader
         print(label_li)
         print('\nEpoch: {:02d} | example label: {}\n'.format(e, lat_x))
     labels = pd.Series(label_li)
