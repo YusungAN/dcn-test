@@ -16,8 +16,8 @@ def evaluate(model, test_loader, label_list):
         latent_X = model.autoencoder(data, latent=True)
         latent_X = latent_X.detach().cpu().numpy()
 
-        lat_x = model.kmeans.update_assign(latent_X).reshape(-1, 1)
-        label_list.append(lat_x)
+        label_x = model.kmeans.update_assign(latent_X)
+        label_list = np.hstack((label_list, label_x))
 
     return lat_x
 
@@ -46,7 +46,10 @@ def solver(args, model, train_loader):
 
         print('\nEpoch: {:02d} | example label: {}\n'.format(e, lat_x))
 
-    print('\nall length:', len(label_li))
+    labels = pd.Series(label_li)
+    ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
+    ns_yoga['label'] = labels
+    ns_yoga.to_csv('ns_yoga_labeled.csv')
 
 if __name__ == '__main__':
 
