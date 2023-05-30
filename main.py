@@ -97,7 +97,7 @@ if __name__ == '__main__':
     # Utility parameters
     parser.add_argument('--n-jobs', type=int, default=1,
                         help='number of jobs to run in parallel')
-    parser.add_argument('--cuda', type=bool, default=False,
+    parser.add_argument('--cuda', type=bool, default=True,
                         help='whether to use GPU')
     parser.add_argument('--log-interval', type=int, default=100,
                         help=('how many batches to wait before logging the '
