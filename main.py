@@ -17,7 +17,6 @@ def evaluate(model, test_loader):
         latent_X = latent_X.detach().cpu().numpy()
 
         label_x = model.kmeans.update_assign(latent_X)
-        print('eval', label_x)
         label_list = np.hstack((label_list, label_x))
 
     return label_list
