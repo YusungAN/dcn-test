@@ -139,8 +139,8 @@ if __name__ == '__main__':
     ns_yoga.dropna(subset=['content'], inplace=True)
     td = [0] * len(ns_yoga.index) # ?
     td = ns_yoga['content'].apply(bert_embedding)
-    td = td.values
-    print(type(td))
+    td = td.values.tolist()
+    td = np.asmatrix(td)
     td = torch.tensor(np.matrix(td)).type(torch.float32)
     dataset = torch.utils.data.TensorDataset(td)
     train_loader = torch.utils.data.DataLoader(
