@@ -8,6 +8,7 @@ from sklearn.metrics import normalized_mutual_info_score
 import pandas as pd
 import torch
 from transformers import BertTokenizer, BertModel
+import pickle
 
 def evaluate(model, test_loader):
     label_list = []
@@ -147,11 +148,13 @@ if __name__ == '__main__':
         bert_model.eval()
         td = content_series.apply(bert_embedding)
         td = td.values.tolist()
+        with open("bert_embedding.pickle", "wb") as fw:
+            pickle.dump(td, fw)
         embedded_data = np.asmatrix(td)
     else:
         embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
 
-    embedded_data = torch.tensor(np.matrix(embedded_data)).type(torch.float32)
+    embedded_data = torch.tensor(embedded_data).type(torch.float32)
     dataset = torch.utils.data.TensorDataset(embedded_data)
     train_loader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=False
