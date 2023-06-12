@@ -133,13 +133,13 @@ if __name__ == '__main__':
             hidden_states = outputs[2]
             token_vecs = hidden_states[-2][0]
             sentence_embedding = torch.mean(token_vecs, dim=0)
-        return sentence_embedding
+        return sentence_embedding.tolist()
 
 
     ns_yoga.dropna(subset=['content'], inplace=True)
     td = [0] * len(ns_yoga.index)
     td = ns_yoga['content'].apply(bert_embedding)
-    bert_embedding = torch.tensor(td).type(torch.float32)
+    td = torch.tensor(td).type(torch.float32)
     dataset = torch.utils.data.TensorDataset(td)
     train_loader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=False
