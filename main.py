@@ -6,6 +6,8 @@ from torchvision import datasets, transforms
 from sklearn.metrics import adjusted_rand_score
 from sklearn.metrics import normalized_mutual_info_score
 import pandas as pd
+import torch
+from transformers import BertTokenizer, BertModel
 
 def evaluate(model, test_loader):
     label_list = []
@@ -31,6 +33,30 @@ def get_tfidf_data(train_data):
     return tfidf_train
 
 
+def bert_embedding(text, model):
+    text = str(text)
+    print(text)
+    marked_text = "[CLS] " + text + " [SEP]"
+    tokenized_text = tokenizer.tokenize(marked_text)
+    indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
+    segments_ids = [1] * len(tokenized_text)
+    if len(indexed_tokens) > 512:
+        indexed_tokens = indexed_tokens[:512]
+        segments_ids = segments_ids[:512]
+    tokens_tensor = torch.tensor([indexed_tokens])
+    segments_tensors = torch.tensor([segments_ids])
+
+    with torch.no_grad():
+        tokens_tensor = tokens_tensor.to('cuda')
+        segments_tensors = segments_tensors.to('cuda')
+        print(len(tokens_tensor[0]))
+        outputs = model(tokens_tensor, segments_tensors)
+        hidden_states = outputs[2]
+        token_vecs = hidden_states[-2][0]
+        sentence_embedding = torch.mean(token_vecs, dim=0)
+    return sentence_embedding
+
+
 def solver(args, model, train_loader):
     label_li = []
     rec_loss_list = model.pretrain(train_loader, args.pre_epoch)
@@ -53,7 +79,7 @@ if __name__ == '__main__':
     # Dataset parameters
     parser.add_argument('--dir', default='../Dataset/mnist',
                         help='dataset directory')
-    parser.add_argument('--input-dim', type=int, default=10*10,
+    parser.add_argument('--input-dim', type=int, default=768,
                         help='input dimension')
     parser.add_argument('--n-classes', type=int, default=4,
                         help='output dimension')
@@ -98,8 +124,21 @@ if __name__ == '__main__':
 
     ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
     ns_yoga.dropna(subset=['content'], inplace=True)
-    tfidf = torch.tensor(get_tfidf_data(ns_yoga)).type(torch.float32)
-    dataset = torch.utils.data.TensorDataset(tfidf)
+    # tfidf = torch.tensor(get_tfidf_data(ns_yoga)).type(torch.float32)
+    # dataset = torch.utils.data.TensorDataset(tfidf)
+    # train_loader = torch.utils.data.DataLoader(
+    #     dataset, batch_size=args.batch_size, shuffle=False
+    # )
+
+    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+    bert_model = BertModel.from_pretrained('bert-base-multilingual-cased', output_hidden_states=True)
+    bert_model.cuda()
+    bert_model.eval()
+    ns_yoga.dropna(subset=['content'], inplace=True)
+    td = [0] * len(ns_yoga.index)
+    td = ns_yoga['content'].apply(bert_embedding)
+    bert_embedding = torch.tensor(td).type(torch.float32)
+    dataset = torch.utils.data.TensorDataset(td)
     train_loader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=False
     )
