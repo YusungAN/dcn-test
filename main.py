@@ -96,7 +96,7 @@ if __name__ == '__main__':
                         help=('how many batches to wait before logging the '
                               'training status'))
 
-    parser.add_argument('--use_bert_or_tfidf', type=int, dafault=1,
+    parser.add_argument('--use_bert_or_tfidf', type=int, default=1,
                         help='if it is 1, use bert for sentence embedding or tfidf')
 
     args = parser.parse_args()
