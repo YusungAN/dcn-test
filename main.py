@@ -140,7 +140,8 @@ if __name__ == '__main__':
     td = [0] * len(ns_yoga.index) # ?
     td = ns_yoga['content'].apply(bert_embedding)
     td = td.values
-    td = torch.tensor(td).type(torch.float32)
+    print(type(td))
+    td = torch.tensor(np.matrix(td)).type(torch.float32)
     dataset = torch.utils.data.TensorDataset(td)
     train_loader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=False
