@@ -27,8 +27,8 @@ def evaluate(model, test_loader):
 def get_tfidf_data(train_data):
 
     from sklearn.feature_extraction.text import TfidfVectorizer
-    vec_tfidf = TfidfVectorizer(max_features=10*10)
-    tfidf_train = vec_tfidf.fit_transform(train_data['content'].tolist()).todense()
+    vec_tfidf = TfidfVectorizer(max_features=768)
+    tfidf_train = vec_tfidf.fit_transform(train_data.tolist()).todense()
 
     return tfidf_train
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
                         help='dataset directory')
     parser.add_argument('--input-dim', type=int, default=768,
                         help='input dimension')
-    parser.add_argument('--n-classes', type=int, default=4,
+    parser.add_argument('--n-classes', type=int, default=10,
                         help='output dimension')
 
     # Training parameters
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                         help='learning rate (default: 1e-4)')
     parser.add_argument('--latent_dim', type=int, default=10,
                         help='latent space dimension')
-    parser.add_argument('--n-clusters', type=int, default=4,
+    parser.add_argument('--n-clusters', type=int, default=10,
                         help='number of clusters in the latent space')
 
     # Utility parameters
@@ -96,20 +96,25 @@ if __name__ == '__main__':
                         help=('how many batches to wait before logging the '
                               'training status'))
 
+    parser.add_argument('--use_bert_or_tfidf', type=int, dafault=1,
+                        help='if it is 1, use bert for sentence embedding or tfidf')
+
     args = parser.parse_args()
 
-    ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
-    ns_yoga.dropna(subset=['content'], inplace=True)
-    # tfidf = torch.tensor(get_tfidf_data(ns_yoga)).type(torch.float32)
-    # dataset = torch.utils.data.TensorDataset(tfidf)
-    # train_loader = torch.utils.data.DataLoader(
-    #     dataset, batch_size=args.batch_size, shuffle=False
-    # )
+    review_df = pd.read_csv('dcn-test/ns_review_txt1.csv')
+    review_df.dropna(subset=['content'], inplace=True)
+    review_df.drop_duplicates('content', inplace=True)
+    content_series = review_df['content']
+    for i in range(2, 9):
+        tmp_df = pd.read_csv('dcn-test/ns_review_txt{}.csv'.format(i))
+        tmp_df.dropna(subset=['content'], inplace=True)
+        tmp_df.drop_duplicates('content', inplace=True)
+        content_series = pd.concat([content_series, tmp_df['content']])
 
-    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
-    bert_model = BertModel.from_pretrained('bert-base-multilingual-cased', output_hidden_states=True)
-    bert_model.cuda()
-    bert_model.eval()
+    print(len(content_series))
+    print(content_series.head(5))
+    print(content_series.tail(5))
+    embedded_data = []
 
 
     def bert_embedding(text):
@@ -135,14 +140,19 @@ if __name__ == '__main__':
             sentence_embedding = torch.mean(token_vecs, dim=0)
         return sentence_embedding.tolist()
 
+    if args.use_bert_or_tfidf == 1:
+        tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+        bert_model = BertModel.from_pretrained('bert-base-multilingual-cased', output_hidden_states=True)
+        bert_model.cuda()
+        bert_model.eval()
+        td = content_series.apply(bert_embedding)
+        td = td.values.tolist()
+        embedded_data = np.asmatrix(td)
+    else:
+        embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
 
-    ns_yoga.dropna(subset=['content'], inplace=True)
-    td = [0] * len(ns_yoga.index) # ?
-    td = ns_yoga['content'].apply(bert_embedding)
-    td = td.values.tolist()
-    td = np.asmatrix(td)
-    td = torch.tensor(np.matrix(td)).type(torch.float32)
-    dataset = torch.utils.data.TensorDataset(td)
+    embedded_data = torch.tensor(np.matrix(embedded_data)).type(torch.float32)
+    dataset = torch.utils.data.TensorDataset(embedded_data)
     train_loader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=False
     )
