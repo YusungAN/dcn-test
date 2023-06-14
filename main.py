@@ -104,7 +104,7 @@ if __name__ == '__main__':
     parser.add_argument('--pickle_download', type=int, default=0,
                         help='if 0, do not download embedding vector file')
     parser.add_argument('--use_tfidf', type=int, default=0,
-                        help('if 1, use tfidf, not bert'))
+                        help='if 1, use tfidf, not bert')
 
     args = parser.parse_args()
 
