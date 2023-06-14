@@ -108,6 +108,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--use_bert_or_tfidf', type=int, default=1,
                         help='if it is 1, use bert for sentence embedding or tfidf')
+    parser.add_argument('--pickle_downloaded', type=int, default=0,
+                        help='if 0, do not download embedding vector file')
 
     args = parser.parse_args()
 
@@ -131,7 +133,7 @@ if __name__ == '__main__':
     else:
         embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
     '''
-
+    '''
     google_path = 'https://drive.google.com/uc?id='
     file_id = ['12MpsAIpYp0f0mOg60ZZ_Rj8e46Z2o3vg',
                '1nmB3doFBLpQtX0ecNyoWjB-9vxiqSe5W',
@@ -146,20 +148,20 @@ if __name__ == '__main__':
         output_name = "review{}_bert_embedding.pickle".format(i)
         gdown.download(google_path+file_id[i-1], output_name, quiet=False)
         print(i)
-
+    '''
     print('end')
 
     with open("review1_bert_embedding.pickle", "rb") as fr:
         data = pickle.load(fr)
 
     full_bert_embedding = torch.tensor(np.array(data))
+    print(1)
     for i in range(2, 9):
         with open("review{}_bert_embedding.pickle".format(i), "rb") as fr:
             data = pickle.load(fr)
-        data = torch.tensor(data)
+        data = torch.tensor(np.array(data))
+        print(i)
         full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
-
-    print('full_bert_embedding: ', full_bert_embedding.size())
 
     # embedded_data = torch.tensor(embedded_data).type(torch.float32)
     dataset = torch.utils.data.TensorDataset(full_bert_embedding)
