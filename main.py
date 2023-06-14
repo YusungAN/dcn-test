@@ -46,11 +46,11 @@ def solver(args, model, train_loader):
         label_li = evaluate(model, train_loader)  # evaluation on test_loader
         print(label_li)
     labels = pd.Series(label_li)
-    review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv')
+    review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')
     review_df.dropna(subset=['content'], inplace=True)
     review_df.drop_duplicates('content', inplace=True)
     for i in range(2, 9):
-        tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i))
+        tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
         tmp_df.dropna(subset=['content'], inplace=True)
         tmp_df.drop_duplicates('content', inplace=True)
         review_df = pd.concat([review_df, tmp_df['content']])
