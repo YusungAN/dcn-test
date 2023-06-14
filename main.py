@@ -136,18 +136,18 @@ if __name__ == '__main__':
     google_path = 'https://drive.google.com/uc?id='
     file_id = ['12MpsAIpYp0f0mOg60ZZ_Rj8e46Z2o3vg',
                '1nmB3doFBLpQtX0ecNyoWjB-9vxiqSe5W',
-               '15g--xA92qHp_N1EDWvTy3GHzg39t5LHL',
-               '1ZUsNeMaJFtAh70HFixicE_KmbnGPW0ET',
-               '1bxduzKRxPcaIiAeUZk0ss08BGWLUMlmu',
+               '1SJX3yqaHp3xGRgEPsX7jpcXezY4gWewS',
+               '1MydEZTMqUa51xjrNwzCNildeC0Acm84Z',
+               '1D0Q5BMyNhgWkPnKMk_3G2pKr1Ex2IecH',
                '1egtaFKyQ3Wwj_JMl8TGCoCqtPNlNgoMZ',
                '1S-FgCqVoq7s6gCbI8tI4pl_YZE2np264',
-               '1XmjjkvdA-Kt-s_X3_BrhTjruOwCQ3Uxi']
+               '1crQ7Cxvo1n2mU62HpB_yOO3UpN4Q6rG2']
     file_id = file_id[::-1]
     for i in range(1, 9):
         output_name = "review{}_bert_embedding.pickle".format(i)
         gdown.download(google_path+file_id[i-1], output_name, quiet=False)
         print(i)
-    
+
     print('end')
 
     with open("review1_bert_embedding.pickle", "rb") as fr:
