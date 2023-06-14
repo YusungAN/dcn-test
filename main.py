@@ -133,7 +133,6 @@ if __name__ == '__main__':
     else:
         embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
     '''
-    '''
     google_path = 'https://drive.google.com/uc?id='
     file_id = ['12MpsAIpYp0f0mOg60ZZ_Rj8e46Z2o3vg',
                '1nmB3doFBLpQtX0ecNyoWjB-9vxiqSe5W',
@@ -148,7 +147,7 @@ if __name__ == '__main__':
         output_name = "review{}_bert_embedding.pickle".format(i)
         gdown.download(google_path+file_id[i-1], output_name, quiet=False)
         print(i)
-    '''
+    
     print('end')
 
     with open("review1_bert_embedding.pickle", "rb") as fr:
