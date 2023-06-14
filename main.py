@@ -105,19 +105,10 @@ if __name__ == '__main__':
     parser.add_argument('--log-interval', type=int, default=100,
                         help=('how many batches to wait before logging the '
                               'training status'))
-
-    parser.add_argument('--use_bert_or_tfidf', type=int, default=1,
-                        help='if it is 1, use bert for sentence embedding or tfidf')
-    parser.add_argument('--pickle_downloaded', type=int, default=0,
+    parser.add_argument('--pickle_download', type=int, default=0,
                         help='if 0, do not download embedding vector file')
 
     args = parser.parse_args()
-
-    '''
-    print(len(review_df))
-    print(review_df.head(5))
-    print(review_df.tail(5))
-    '''
 
     '''
     if args.use_bert_or_tfidf == 1:
@@ -133,22 +124,21 @@ if __name__ == '__main__':
     else:
         embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
     '''
-    google_path = 'https://drive.google.com/uc?id='
-    file_id = ['1_Zh-yrJM5e1M00R_A9L_pgEJuT-__oZZ',
-               '1IucMhCRbo7XFBYGi5cN3L23iNwkoOmzE',
-               '1eotABBI3LLzmtn87FJe8gkakleSQs-5q',
-               '1oHilp0eTurx9qLN8FIoRO6ZDq_azEJgO',
-               '1HxRMyx-WaPm-N8n-76X5ONRKXawvVX8f',
-               '1BBhyshJQT3dZ4W_UCSgk4S4FmM5FyjIf',
-               '1chhsiJuMGZk0daTgu0K1uLUlH-_VYksz',
-               '1bwvlRciJgOVFBqwkhGWCXOZm7O5fQfIB']
-    for i in range(1, 9):
-        output_name = "bert_embedding_tensor{}.pickle".format(i)
-        gdown.download(google_path+file_id[i-1], output_name, quiet=False)
-        print(i)
+    if args.pickle_download:
+        google_path = 'https://drive.google.com/uc?id='
+        file_id = ['1_Zh-yrJM5e1M00R_A9L_pgEJuT-__oZZ',
+                   '1IucMhCRbo7XFBYGi5cN3L23iNwkoOmzE',
+                   '1eotABBI3LLzmtn87FJe8gkakleSQs-5q',
+                   '1oHilp0eTurx9qLN8FIoRO6ZDq_azEJgO',
+                   '1HxRMyx-WaPm-N8n-76X5ONRKXawvVX8f',
+                   '1BBhyshJQT3dZ4W_UCSgk4S4FmM5FyjIf',
+                   '1chhsiJuMGZk0daTgu0K1uLUlH-_VYksz',
+                   '1bwvlRciJgOVFBqwkhGWCXOZm7O5fQfIB']
+        for i in range(1, 9):
+            output_name = "bert_embedding_tensor{}.pickle".format(i)
+            gdown.download(google_path+file_id[i-1], output_name, quiet=False)
+            print(i)
 
-
-    print('end')
 
     with open("bert_embedding_tensor1.pickle", "rb") as fr:
         data = pickle.load(fr)
