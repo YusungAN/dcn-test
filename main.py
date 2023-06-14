@@ -134,31 +134,30 @@ if __name__ == '__main__':
         embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
     '''
     google_path = 'https://drive.google.com/uc?id='
-    file_id = ['12MpsAIpYp0f0mOg60ZZ_Rj8e46Z2o3vg',
-               '1nmB3doFBLpQtX0ecNyoWjB-9vxiqSe5W',
-               '1SJX3yqaHp3xGRgEPsX7jpcXezY4gWewS',
-               '1MydEZTMqUa51xjrNwzCNildeC0Acm84Z',
-               '1D0Q5BMyNhgWkPnKMk_3G2pKr1Ex2IecH',
-               '1egtaFKyQ3Wwj_JMl8TGCoCqtPNlNgoMZ',
-               '1S-FgCqVoq7s6gCbI8tI4pl_YZE2np264',
-               '1hXIsB1ldneQ-OkR96KU8EOkYCFSUtPVk']
-    file_id = file_id[::-1]
+    file_id = ['1_Zh-yrJM5e1M00R_A9L_pgEJuT-__oZZ',
+               '1IucMhCRbo7XFBYGi5cN3L23iNwkoOmzE',
+               '1eotABBI3LLzmtn87FJe8gkakleSQs-5q',
+               '1oHilp0eTurx9qLN8FIoRO6ZDq_azEJgO',
+               '1HxRMyx-WaPm-N8n-76X5ONRKXawvVX8f',
+               '1BBhyshJQT3dZ4W_UCSgk4S4FmM5FyjIf',
+               '1chhsiJuMGZk0daTgu0K1uLUlH-_VYksz',
+               '1bwvlRciJgOVFBqwkhGWCXOZm7O5fQfIB']
     for i in range(1, 9):
-        output_name = "review{}_bert_embedding.pickle".format(i)
+        output_name = "bert_embedding_tensor{}.pickle".format(i)
         gdown.download(google_path+file_id[i-1], output_name, quiet=False)
         print(i)
 
+
     print('end')
 
-    with open("review1_bert_embedding.pickle", "rb") as fr:
+    with open("bert_embedding_tensor1.pickle", "rb") as fr:
         data = pickle.load(fr)
 
-    full_bert_embedding = torch.tensor(np.array(data))
+    full_bert_embedding = data
     print(1)
     for i in range(2, 9):
-        with open("review{}_bert_embedding.pickle".format(i), "rb") as fr:
+        with open("bert_embedding_tensor{}.pickle".format(i), "rb") as fr:
             data = pickle.load(fr)
-        data = torch.tensor(np.array(data))
         print(i)
         full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
 
