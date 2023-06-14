@@ -152,7 +152,7 @@ if __name__ == '__main__':
     with open("review1_bert_embedding.pickle", "rb") as fr:
         data = pickle.load(fr)
 
-    full_bert_embedding = torch.tensor(data)
+    full_bert_embedding = torch.tensor(np.array(data))
     for i in range(2, 9):
         with open("review{}_bert_embedding.pickle".format(i), "rb") as fr:
             data = pickle.load(fr)
