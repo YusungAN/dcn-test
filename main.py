@@ -47,13 +47,9 @@ def solver(args, model, train_loader):
         print(label_li)
     labels = pd.Series(label_li)
     review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')
-    review_df.dropna(subset=['content'], inplace=True)
-    review_df.drop_duplicates('content', inplace=True)
     for i in range(2, 9):
         tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
-        tmp_df.dropna(subset=['content'], inplace=True)
-        tmp_df.drop_duplicates('content', inplace=True)
-        review_df = pd.concat([review_df, tmp_df['content']])
+        review_df = pd.concat([review_df, tmp_df])
 
     review_df['label'] = labels
     review_df.to_csv('full_reviews_bert_labeled.csv')
@@ -107,23 +103,12 @@ if __name__ == '__main__':
                               'training status'))
     parser.add_argument('--pickle_download', type=int, default=0,
                         help='if 0, do not download embedding vector file')
+    parser.add_argument('--use_tfidf', type=int, default=0,
+                        help('if 1, use tfidf, not bert'))
 
     args = parser.parse_args()
 
-    '''
-    if args.use_bert_or_tfidf == 1:
-        tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
-        bert_model = BertModel.from_pretrained('bert-base-multilingual-cased', output_hidden_states=True)
-        bert_model.cuda()
-        bert_model.eval()
-        td = content_series.apply(bert_embedding)
-        td = td.values.tolist()
-        with open("bert_embedding.pickle", "wb") as fw:
-            pickle.dump(td, fw)
-        embedded_data = np.asmatrix(td)
-    else:
-        embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
-    '''
+
     if args.pickle_download:
         google_path = 'https://drive.google.com/uc?id='
         file_id = ['1_Zh-yrJM5e1M00R_A9L_pgEJuT-__oZZ',
@@ -139,23 +124,30 @@ if __name__ == '__main__':
             gdown.download(google_path+file_id[i-1], output_name, quiet=False)
             print(i)
 
-
-    with open("bert_embedding_tensor1.pickle", "rb") as fr:
-        data = pickle.load(fr)
-
-    full_bert_embedding = data
-    print(1)
-    for i in range(2, 9):
-        with open("bert_embedding_tensor{}.pickle".format(i), "rb") as fr:
+    train_loader = 0
+    if args.use_tfidf == 1:
+        review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')
+        for i in range(2, 9):
+            tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
+            review_df = pd.concat([review_df, tmp_df])
+        embedded_data = torch.tensor(get_tfidf_data(review_df['content'])).type(torch.float32)
+    else:
+        with open("bert_embedding_tensor1.pickle", "rb") as fr:
             data = pickle.load(fr)
-        print(i)
-        full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
 
-    # embedded_data = torch.tensor(embedded_data).type(torch.float32)
-    dataset = torch.utils.data.TensorDataset(full_bert_embedding)
-    train_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=args.batch_size, shuffle=False
-    )
+        full_bert_embedding = data
+        print(1)
+        for i in range(2, 9):
+            with open("bert_embedding_tensor{}.pickle".format(i), "rb") as fr:
+                data = pickle.load(fr)
+            print(i)
+            full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
+
+        # embedded_data = torch.tensor(embedded_data).type(torch.float32)
+        dataset = torch.utils.data.TensorDataset(full_bert_embedding)
+        train_loader = torch.utils.data.DataLoader(
+            dataset, batch_size=args.batch_size, shuffle=False
+        )
 
     # Main body
     model = DCN(args)
