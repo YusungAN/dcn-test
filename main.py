@@ -9,6 +9,7 @@ import pandas as pd
 import torch
 from transformers import BertTokenizer, BertModel
 import pickle
+import gdown
 
 def evaluate(model, test_loader):
     label_list = []
@@ -130,12 +131,30 @@ if __name__ == '__main__':
     else:
         embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
     '''
-    with open("review1_bert_embedding.pickle", "rb") as fr:
+
+    google_path = 'https://drive.google.com/uc?id='
+    file_id = ['12MpsAIpYp0f0mOg60ZZ_Rj8e46Z2o3vg',
+               '1nmB3doFBLpQtX0ecNyoWjB-9vxiqSe5W',
+               '15g--xA92qHp_N1EDWvTy3GHzg39t5LHL',
+               '1ZUsNeMaJFtAh70HFixicE_KmbnGPW0ET',
+               '1bxduzKRxPcaIiAeUZk0ss08BGWLUMlmu',
+               '1egtaFKyQ3Wwj_JMl8TGCoCqtPNlNgoMZ',
+               '1S-FgCqVoq7s6gCbI8tI4pl_YZE2np264',
+               '1XmjjkvdA-Kt-s_X3_BrhTjruOwCQ3Uxi']
+    file_id = file_id[::-1]
+    for i in range(1, 9):
+        output_name = "review{}_bert_embedding.pickle".format(i)
+        gdown.download(google_path+file_id[i-1], output_name, quiet=False)
+        print(i)
+
+    print('end')
+
+    with open("dcn-test/review1_bert_embedding.pickle", "rb") as fr:
         data = pickle.load(fr)
 
     full_bert_embedding = torch.tensor(data)
     for i in range(2, 9):
-        with open("review{}_bert_embedding.pickle".format(i), "rb") as fr:
+        with open("dcn-test/review{}_bert_embedding.pickle".format(i), "rb") as fr:
             data = pickle.load(fr)
         data = torch.tensor(data)
         full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
