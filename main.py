@@ -149,12 +149,12 @@ if __name__ == '__main__':
 
     print('end')
 
-    with open("dcn-test/review1_bert_embedding.pickle", "rb") as fr:
+    with open("review1_bert_embedding.pickle", "rb") as fr:
         data = pickle.load(fr)
 
     full_bert_embedding = torch.tensor(data)
     for i in range(2, 9):
-        with open("dcn-test/review{}_bert_embedding.pickle".format(i), "rb") as fr:
+        with open("review{}_bert_embedding.pickle".format(i), "rb") as fr:
             data = pickle.load(fr)
         data = torch.tensor(data)
         full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
