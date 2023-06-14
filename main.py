@@ -45,9 +45,17 @@ def solver(args, model, train_loader):
         label_li = evaluate(model, train_loader)  # evaluation on test_loader
         print(label_li)
     labels = pd.Series(label_li)
-    ns_yoga = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
-    ns_yoga['label'] = labels
-    ns_yoga.to_csv('ns_yoga_labeled.csv')
+    review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv')
+    review_df.dropna(subset=['content'], inplace=True)
+    review_df.drop_duplicates('content', inplace=True)
+    for i in range(2, 9):
+        tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i))
+        tmp_df.dropna(subset=['content'], inplace=True)
+        tmp_df.drop_duplicates('content', inplace=True)
+        review_df = pd.concat([review_df, tmp_df['content']])
+
+    review_df['label'] = labels
+    review_df.to_csv('full_reviews_bert_labeled.csv')
 
 if __name__ == '__main__':
 
@@ -102,45 +110,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    review_df = pd.read_csv('dcn-test/ns_review_txt1.csv')
-    review_df.dropna(subset=['content'], inplace=True)
-    review_df.drop_duplicates('content', inplace=True)
-    content_series = review_df['content']
-    for i in range(2, 9):
-        tmp_df = pd.read_csv('dcn-test/ns_review_txt{}.csv'.format(i))
-        tmp_df.dropna(subset=['content'], inplace=True)
-        tmp_df.drop_duplicates('content', inplace=True)
-        content_series = pd.concat([content_series, tmp_df['content']])
+    '''
+    print(len(review_df))
+    print(review_df.head(5))
+    print(review_df.tail(5))
+    '''
 
-    print(len(content_series))
-    print(content_series.head(5))
-    print(content_series.tail(5))
-    embedded_data = []
-
-
-    def bert_embedding(text):
-        text = str(text)
-        print(text)
-        marked_text = "[CLS] " + text + " [SEP]"
-        tokenized_text = tokenizer.tokenize(marked_text)
-        indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
-        segments_ids = [1] * len(tokenized_text)
-        if len(indexed_tokens) > 512:
-            indexed_tokens = indexed_tokens[:512]
-            segments_ids = segments_ids[:512]
-        tokens_tensor = torch.tensor([indexed_tokens])
-        segments_tensors = torch.tensor([segments_ids])
-
-        with torch.no_grad():
-            tokens_tensor = tokens_tensor.to('cuda')
-            segments_tensors = segments_tensors.to('cuda')
-            print(len(tokens_tensor[0]))
-            outputs = bert_model(tokens_tensor, segments_tensors)
-            hidden_states = outputs[2]
-            token_vecs = hidden_states[-2][0]
-            sentence_embedding = torch.mean(token_vecs, dim=0)
-        return sentence_embedding.tolist()
-
+    '''
     if args.use_bert_or_tfidf == 1:
         tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
         bert_model = BertModel.from_pretrained('bert-base-multilingual-cased', output_hidden_states=True)
@@ -153,9 +129,21 @@ if __name__ == '__main__':
         embedded_data = np.asmatrix(td)
     else:
         embedded_data = torch.tensor(get_tfidf_data(content_series)).type(torch.float32)
+    '''
+    with open("review1_bert_embedding.pickle", "rb") as fr:
+        data = pickle.load(fr)
 
-    embedded_data = torch.tensor(embedded_data).type(torch.float32)
-    dataset = torch.utils.data.TensorDataset(embedded_data)
+    full_bert_embedding = torch.tensor(data)
+    for i in range(2, 9):
+        with open("review{}_bert_embedding.pickle".format(i), "rb") as fr:
+            data = pickle.load(fr)
+        data = torch.tensor(data)
+        full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
+
+    print('full_bert_embedding: ', full_bert_embedding.size())
+
+    # embedded_data = torch.tensor(embedded_data).type(torch.float32)
+    dataset = torch.utils.data.TensorDataset(full_bert_embedding)
     train_loader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=False
     )
