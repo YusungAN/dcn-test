@@ -141,7 +141,7 @@ if __name__ == '__main__':
                '1D0Q5BMyNhgWkPnKMk_3G2pKr1Ex2IecH',
                '1egtaFKyQ3Wwj_JMl8TGCoCqtPNlNgoMZ',
                '1S-FgCqVoq7s6gCbI8tI4pl_YZE2np264',
-               '1crQ7Cxvo1n2mU62HpB_yOO3UpN4Q6rG2']
+               '1hXIsB1ldneQ-OkR96KU8EOkYCFSUtPVk']
     file_id = file_id[::-1]
     for i in range(1, 9):
         output_name = "review{}_bert_embedding.pickle".format(i)
