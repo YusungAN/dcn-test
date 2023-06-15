@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
         dataset = torch.utils.data.TensorDataset(embedded_data)
         train_loader = torch.utils.data.DataLoader(
-            dataset, batch_size=args.batch_size, shuffle=False
+            dataset, batch_size=args.batch_size, shuffle=True
         )
         print('end')
     else:
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         # embedded_data = torch.tensor(embedded_data).type(torch.float32)
         dataset = torch.utils.data.TensorDataset(full_bert_embedding)
         train_loader = torch.utils.data.DataLoader(
-            dataset, batch_size=args.batch_size, shuffle=False
+            dataset, batch_size=args.batch_size, shuffle=True
         )
 
     # Main body
