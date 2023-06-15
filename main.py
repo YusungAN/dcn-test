@@ -29,7 +29,7 @@ def evaluate(model, test_loader):
 def get_tfidf_data(train_data):
 
     from sklearn.feature_extraction.text import TfidfVectorizer
-    vec_tfidf = TfidfVectorizer(max_features=768)
+    vec_tfidf = TfidfVectorizer(max_features=100)
     tfidf_train = vec_tfidf.fit_transform(train_data.tolist()).todense()
 
     return tfidf_train
@@ -133,7 +133,7 @@ if __name__ == '__main__':
             tmp_data = torch.tensor(get_tfidf_data(tmp_df['content'])).type(torch.float32)
             embedded_data = torch.cat([embedded_data, tmp_data], dim=0)
             print(i)
-            
+
         dataset = torch.utils.data.TensorDataset(embedded_data)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False

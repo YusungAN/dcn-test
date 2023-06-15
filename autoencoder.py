@@ -27,6 +27,7 @@ class AutoEncoder(nn.Module):
             if idx == 0:
                 layers.update(
                     {
+                        'conv1d': nn.Conv1d(768, self.input_dim, kernel_size=3)
                         'linear0': nn.Linear(self.input_dim, hidden_dim),
                         'activation0': nn.ReLU()
                     }
@@ -52,6 +53,8 @@ class AutoEncoder(nn.Module):
                     {
                         'linear{}'.format(idx): nn.Linear(
                             hidden_dim, self.output_dim),
+                        'deconv1d{}'.format(idx): nn.ConvTranspose1d(self.input_dim, 768, kernel_size=3)
+
                     }
                 )
             else:
