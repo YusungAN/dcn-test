@@ -67,7 +67,7 @@ if __name__ == '__main__':
                         help='output dimension')
 
     # Training parameters
-    parser.add_argument('--lr', type=float, default=1e-4,
+    parser.add_argument('--lr', type=float, default=2e-4,
                         help='learning rate (default: 1e-4)')
     parser.add_argument('--wd', type=float, default=5e-4,
                         help='weight decay (default: 5e-4)')
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     parser.add_argument('--beta', type=float, default=1,
                         help=('coefficient of the regularization term on '
                               'clustering'))
-    parser.add_argument('--hidden-dims', default=[1000, 1000, 4000],
+    parser.add_argument('--hidden-dims', default=[500, 500, 2000],
                         help='learning rate (default: 1e-4)')
     parser.add_argument('--latent_dim', type=int, default=10,
                         help='latent space dimension')
