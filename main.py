@@ -130,11 +130,13 @@ if __name__ == '__main__':
         for i in range(2, 9):
             tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
             review_df = pd.concat([review_df, tmp_df])
+            print(i)
         embedded_data = torch.tensor(get_tfidf_data(review_df['content'])).type(torch.float32)
         dataset = torch.utils.data.TensorDataset(embedded_data)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False
         )
+        print('end')
     else:
         with open("bert_embedding_tensor1.pickle", "rb") as fr:
             data = pickle.load(fr)
