@@ -126,12 +126,14 @@ if __name__ == '__main__':
 
     train_loader = 0
     if args.use_tfidf == 1:
-        review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')
+        review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')['content']
+        embedded_data = torch.tensor(get_tfidf_data(review_df))
         for i in range(2, 9):
             tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
-            review_df = pd.concat([review_df, tmp_df])
+            tmp_data = torch.tensor(get_tfidf_data(tmp_df['content'])).type(torch.float32)
+            embedded_data = torch.cat([embedded_data, tmp_data], dim=0)
             print(i)
-        embedded_data = torch.tensor(get_tfidf_data(review_df['content'])).type(torch.float32)
+            
         dataset = torch.utils.data.TensorDataset(embedded_data)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False
