@@ -45,13 +45,15 @@ def solver(args, model, train_loader):
         label_li = evaluate(model, train_loader)  # evaluation on test_loader
         print(set(label_li))
     labels = pd.Series(label_li)
+    review_df = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
+    '''
     review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')
     for i in range(2, 9):
         tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
         review_df = pd.concat([review_df, tmp_df])
-
+    '''
     review_df['label'] = labels
-    review_df.to_csv('full_reviews_bert_labeled.csv')
+    review_df.to_csv('yoga_reviews_bert_labeled.csv')
 
 if __name__ == '__main__':
 
@@ -85,7 +87,7 @@ if __name__ == '__main__':
     parser.add_argument('--beta', type=float, default=1,
                         help=('coefficient of the regularization term on '
                               'clustering'))
-    parser.add_argument('--hidden-dims', default=[192, 192, 768],
+    parser.add_argument('--hidden-dims', default=[500, 500, 2000],
                         help='learning rate (default: 1e-4)')
     parser.add_argument('--latent_dim', type=int, default=10,
                         help='latent space dimension')
