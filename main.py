@@ -87,7 +87,7 @@ if __name__ == '__main__':
     parser.add_argument('--beta', type=float, default=1,
                         help=('coefficient of the regularization term on '
                               'clustering'))
-    parser.add_argument('--hidden-dims', default=[500, 500, 2000],
+    parser.add_argument('--hidden-dims', default=[192, 192, 768],
                         help='learning rate (default: 1e-4)')
     parser.add_argument('--latent_dim', type=int, default=10,
                         help='latent space dimension')
