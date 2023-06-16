@@ -10,6 +10,7 @@ import torch
 from transformers import BertTokenizer, BertModel
 import pickle
 import gdown
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def evaluate(model, test_loader):
     label_list = []
@@ -27,8 +28,6 @@ def evaluate(model, test_loader):
 
 
 def get_tfidf_data(train_data):
-
-    from sklearn.feature_extraction.text import TfidfVectorizer
     vec_tfidf = TfidfVectorizer(max_features=100)
     tfidf_train = vec_tfidf.fit_transform(train_data.tolist()).todense()
 
@@ -140,19 +139,21 @@ if __name__ == '__main__':
         )
         print('end')
     else:
-        with open("bert_embedding_tensor1.pickle", "rb") as fr:
+        with open("yoga_ksbert_embedding.pickle", "rb") as fr:
             data = pickle.load(fr)
+        # with open("bert_embedding_tensor1.pickle", "rb") as fr:
+        #     data = pickle.load(fr)
 
-        full_bert_embedding = data
-        print(1)
-        for i in range(2, 9):
-            with open("bert_embedding_tensor{}.pickle".format(i), "rb") as fr:
-                data = pickle.load(fr)
-            print(i)
-            full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
+        # full_bert_embedding = data
+        # print(1)
+        # for i in range(2, 9):
+        #    with open("bert_embedding_tensor{}.pickle".format(i), "rb") as fr:
+        #        data = pickle.load(fr)
+        #    print(i)
+        #    full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
 
         # embedded_data = torch.tensor(embedded_data).type(torch.float32)
-        dataset = torch.utils.data.TensorDataset(full_bert_embedding)
+        dataset = torch.utils.data.TensorDataset(data)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False
         )
