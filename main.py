@@ -1,9 +1,6 @@
 import argparse
 import numpy as np
 from DCN import DCN
-from torchvision import datasets, transforms
-from sklearn.metrics import adjusted_rand_score
-from sklearn.metrics import normalized_mutual_info_score
 import pandas as pd
 import torch
 import pickle
@@ -124,10 +121,10 @@ if __name__ == '__main__':
 
     train_loader = 0
     if args.use_tfidf == 1:
-        review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')['content']
+        review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup_min.csv', lineterminator='\n')['content']
         embedded_data = torch.tensor(get_tfidf_data(review_df))
         for i in range(2, 9):
-            tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
+            tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup_min.csv'.format(i), lineterminator='\n')
             tmp_data = torch.tensor(get_tfidf_data(tmp_df['content'])).type(torch.float32)
             embedded_data = torch.cat([embedded_data, tmp_data], dim=0)
             print(i)
@@ -138,13 +135,13 @@ if __name__ == '__main__':
         )
         print('end')
     else:
-        with open("review_ksbert_embedding1.pickle", "rb") as fr:
+        with open("review_ksbert_embedding1_min.pickle", "rb") as fr:
             data = pickle.load(fr)
 
         full_bert_embedding = data[:10000]
         print(1)
         for i in range(2, 9):
-            with open("review_ksbert_embedding{}.pickle".format(i), "rb") as fr:
+            with open("review_ksbert_embedding{}_min.pickle".format(i), "rb") as fr:
                 data = pickle.load(fr)[:10000]
             print(i)
             full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
