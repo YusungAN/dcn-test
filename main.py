@@ -135,13 +135,13 @@ if __name__ == '__main__':
         )
         print('end')
     else:
-        with open("review_ksbert_embedding1_min.pickle", "rb") as fr:
+        with open("review_ksbert_embedding_min1.pickle", "rb") as fr:
             data = pickle.load(fr)
 
         full_bert_embedding = data[:10000]
         print(1)
         for i in range(2, 9):
-            with open("review_ksbert_embedding{}_min.pickle".format(i), "rb") as fr:
+            with open("review_ksbert_embedding_min{}.pickle".format(i), "rb") as fr:
                 data = pickle.load(fr)[:10000]
             print(i)
             full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
