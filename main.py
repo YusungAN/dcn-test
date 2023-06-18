@@ -149,7 +149,7 @@ if __name__ == '__main__':
             print(i)
             full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
         '''
-        with open("ksbert_embedding_min.pickle", "rb") as fr:
+        with open("ksbert_embedding_min_df", "rb") as fr:
             data = pickle.load(fr)
         dataset = torch.utils.data.TensorDataset(data)
         train_loader = torch.utils.data.DataLoader(
