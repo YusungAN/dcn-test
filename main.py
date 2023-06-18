@@ -45,15 +45,14 @@ def solver(args, model, train_loader):
         label_li = evaluate(model, train_loader)  # evaluation on test_loader
         print(set(label_li))
     labels = pd.Series(label_li)
-    review_df = pd.read_csv('dcn-test/ns_yoga_preprocessed.csv')
-    '''
+
     review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')
     for i in range(2, 9):
         tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
         review_df = pd.concat([review_df, tmp_df])
-    '''
+
     review_df['label'] = labels
-    review_df.to_csv('yoga_reviews_bert_labeled.csv')
+    review_df.to_csv('reviews_ksbert_labeled.csv')
 
 if __name__ == '__main__':
 
@@ -141,21 +140,18 @@ if __name__ == '__main__':
         )
         print('end')
     else:
-        with open("yoga_ksbert_embedding.pickle", "rb") as fr:
+        with open("review_ksbert_embedding1.pickle", "rb") as fr:
             data = pickle.load(fr)
-        # with open("bert_embedding_tensor1.pickle", "rb") as fr:
-        #     data = pickle.load(fr)
 
-        # full_bert_embedding = data
-        # print(1)
-        # for i in range(2, 9):
-        #    with open("bert_embedding_tensor{}.pickle".format(i), "rb") as fr:
-        #        data = pickle.load(fr)
-        #    print(i)
-        #    full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
+        full_bert_embedding = data
+        print(1)
+        for i in range(2, 9):
+            with open("review_ksbert_embedding{}.pickle".format(i), "rb") as fr:
+                data = pickle.load(fr)
+            print(i)
+            full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
 
-        # embedded_data = torch.tensor(embedded_data).type(torch.float32)
-        dataset = torch.utils.data.TensorDataset(data)
+        dataset = torch.utils.data.TensorDataset(full_bert_embedding)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False
         )
