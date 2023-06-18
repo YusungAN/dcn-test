@@ -40,12 +40,14 @@ def solver(args, model, train_loader):
         label_li = evaluate(model, train_loader)  # evaluation on test_loader
         print(set(label_li))
     labels = pd.Series(label_li)
-
+    '''
     review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n').iloc[:10000]
     for i in range(2, 9):
         tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n').iloc[:10000]
         review_df = pd.concat([review_df, tmp_df])
-
+    '''
+    with open("review_min_df", "rb") as fr:
+        review_df = pickle.load(fr)
     review_df['label'] = labels
     review_df.to_csv('reviews_ksbert_labeled.csv')
 
@@ -135,6 +137,7 @@ if __name__ == '__main__':
         )
         print('end')
     else:
+        '''
         with open("review_ksbert_embedding1.pickle", "rb") as fr:
             data = pickle.load(fr)
 
@@ -145,8 +148,10 @@ if __name__ == '__main__':
                 data = pickle.load(fr)[:10000]
             print(i)
             full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
-
-        dataset = torch.utils.data.TensorDataset(full_bert_embedding)
+        '''
+        with open("ksbert_embedding_min.pickle", "rb") as fr:
+            data = pickle.load(fr)
+        dataset = torch.utils.data.TensorDataset(data)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False
         )
