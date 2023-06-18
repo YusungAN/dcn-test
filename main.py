@@ -1,4 +1,3 @@
-import torch
 import argparse
 import numpy as np
 from DCN import DCN
@@ -7,7 +6,6 @@ from sklearn.metrics import adjusted_rand_score
 from sklearn.metrics import normalized_mutual_info_score
 import pandas as pd
 import torch
-from transformers import BertTokenizer, BertModel
 import pickle
 import gdown
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -46,9 +44,9 @@ def solver(args, model, train_loader):
         print(set(label_li))
     labels = pd.Series(label_li)
 
-    review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n')
+    review_df = pd.read_csv('dcn-test/ns_review_txt1_drop_dup.csv', lineterminator='\n').iloc[:10000]
     for i in range(2, 9):
-        tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n')
+        tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n').iloc[:10000]
         review_df = pd.concat([review_df, tmp_df])
 
     review_df['label'] = labels
@@ -143,11 +141,11 @@ if __name__ == '__main__':
         with open("review_ksbert_embedding1.pickle", "rb") as fr:
             data = pickle.load(fr)
 
-        full_bert_embedding = data
+        full_bert_embedding = data[:10000]
         print(1)
         for i in range(2, 9):
             with open("review_ksbert_embedding{}.pickle".format(i), "rb") as fr:
-                data = pickle.load(fr)
+                data = pickle.load(fr)[:10000]
             print(i)
             full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
 
