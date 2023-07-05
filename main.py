@@ -6,7 +6,8 @@ import torch
 import pickle
 import gdown
 from sklearn.feature_extraction.text import TfidfVectorizer
-from transformers import BertTokenizer, BertConfig, BertModel
+# from transformers import BertTokenizer, BertConfig, BertModel
+from sentence_transformers import SentenceTransformer
 
 def evaluate(model, test_loader):
     label_list = []
@@ -136,24 +137,16 @@ if __name__ == '__main__':
         )
         print('end')
     else:
-        tokenizer = BertTokenizer.from_pretrained("beomi/kcbert-base", do_lower_case=False)
-        pretrained_model_config = BertConfig.from_pretrained("beomi/kcbert-base")
-        model = BertModel.from_pretrained("beomi/kcbert-base", config=pretrained_model_config)
+        # tokenizer = BertTokenizer.from_pretrained("beomi/kcbert-base", do_lower_case=False)
+        # pretrained_model_config = BertConfig.from_pretrained("beomi/kcbert-base")
+        # model = BertModel.from_pretrained("beomi/kcbert-base", config=pretrained_model_config)
+        embedder = SentenceTransformer("jhgan/ko-sroberta-multitask")
 
         with open("data.pickle", "rb") as fr:
             sentences = pickle.load(fr)
 
-        features = tokenizer(
-            sentences,
-            max_length=300,
-            padding="max_length",
-            truncation=True,
-        )
-
-        features = {k: torch.tensor(v) for k, v in features.items()}
-
-        outputs = model(**features)
-        dataset = torch.utils.data.TensorDataset(outputs.last_hidden_state)
+        corpus_embeddings = embedder.encode(sentences, convert_to_tensor=True)
+        dataset = torch.utils.data.TensorDataset(corpus_embeddings)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False
         )
