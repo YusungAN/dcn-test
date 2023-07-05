@@ -6,6 +6,7 @@ import torch
 import pickle
 import gdown
 from sklearn.feature_extraction.text import TfidfVectorizer
+from transformers import BertTokenizer, BertConfig, BertModel
 
 def evaluate(model, test_loader):
     label_list = []
@@ -137,21 +138,24 @@ if __name__ == '__main__':
         )
         print('end')
     else:
-        '''
-        with open("review_ksbert_embedding1.pickle", "rb") as fr:
-            data = pickle.load(fr)
+        tokenizer = BertTokenizer.from_pretrained("beomi/kcbert-base", do_lower_case=False)
+        pretrained_model_config = BertConfig.from_pretrained("beomi/kcbert-base")
+        model = BertModel.from_pretrained("beomi/kcbert-base", config=pretrained_model_config)
 
-        full_bert_embedding = data[:10000]
-        print(1)
-        for i in range(2, 9):
-            with open("review_ksbert_embedding{}.pickle".format(i), "rb") as fr:
-                data = pickle.load(fr)[:10000]
-            print(i)
-            full_bert_embedding = torch.cat([full_bert_embedding, data], dim=0)
-        '''
-        with open("ksbert_embedding_min_df", "rb") as fr:
-            data = pickle.load(fr)
-        dataset = torch.utils.data.TensorDataset(data)
+        with open("data.pickle", "rb") as fr:
+            sentences = pickle.load(fr)
+
+        features = tokenizer(
+            sentences,
+            max_length=512,
+            padding="max_length",
+            truncation=True,
+        )
+
+        features = {k: torch.tensor(v) for k, v in features.items()}
+
+        outputs = model(**features)
+        dataset = torch.utils.data.TensorDataset(outputs.last_hidden_state)
         train_loader = torch.utils.data.DataLoader(
             dataset, batch_size=args.batch_size, shuffle=False
         )
