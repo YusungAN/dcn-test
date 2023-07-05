@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
         features = tokenizer(
             sentences,
-            max_length=512,
+            max_length=300,
             padding="max_length",
             truncation=True,
         )
