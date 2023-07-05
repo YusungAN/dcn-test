@@ -47,10 +47,8 @@ def solver(args, model, train_loader):
         tmp_df = pd.read_csv('dcn-test/ns_review_txt{}_drop_dup.csv'.format(i), lineterminator='\n').iloc[:10000]
         review_df = pd.concat([review_df, tmp_df])
     '''
-    with open("review_min_df", "rb") as fr:
-        review_df = pickle.load(fr)
-    review_df['label'] = labels
-    review_df.to_csv('reviews_ksbert_labeled.csv')
+    with open("labels.pickle", "wb") as fw:
+        pickle.dump(labels, fw)
 
 if __name__ == '__main__':
 
