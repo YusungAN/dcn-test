@@ -140,7 +140,7 @@ if __name__ == '__main__':
         # tokenizer = BertTokenizer.from_pretrained("beomi/kcbert-base", do_lower_case=False)
         # pretrained_model_config = BertConfig.from_pretrained("beomi/kcbert-base")
         # model = BertModel.from_pretrained("beomi/kcbert-base", config=pretrained_model_config)
-        embedder = SentenceTransformer("jhgan/ko-sroberta-multitask")
+        embedder = SentenceTransformer("beomi/KcELECTRA-base-v2022")
 
         with open("data.pickle", "rb") as fr:
             sentences = pickle.load(fr)
